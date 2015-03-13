@@ -63,7 +63,7 @@ static CGFloat const ATLButtonHeight = 28.0f;
         self.leftAccessoryButton = [[UIButton alloc] init];
         self.leftAccessoryButton.accessibilityLabel = ATLMessageInputToolbarCameraButton;
         self.leftAccessoryButton.contentMode = UIViewContentModeScaleAspectFit;
-        [self.leftAccessoryButton setImage:[UIImage imageNamed:@"AtlasResource.bundle/camera_dark"] forState:UIControlStateNormal];
+        [self.leftAccessoryButton setImage:[UIImage imageNamed:@"camera_dark"] forState:UIControlStateNormal];
         [self.leftAccessoryButton addTarget:self action:@selector(leftAccessoryButtonTapped) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:self.leftAccessoryButton];
         
@@ -308,7 +308,7 @@ static CGFloat const ATLButtonHeight = 28.0f;
         self.rightAccessoryButton.accessibilityLabel = ATLMessageInputToolbarLocationButton;
         [self.rightAccessoryButton setTitle:nil forState:UIControlStateNormal];
         self.rightAccessoryButton.contentEdgeInsets = UIEdgeInsetsZero;
-        [self.rightAccessoryButton setImage:[UIImage imageNamed:@"AtlasResource.bundle/location_dark"] forState:UIControlStateNormal];
+        [self.rightAccessoryButton setImage:[UIImage imageNamed:@"location_dark"] forState:UIControlStateNormal];
     }
 }
 
