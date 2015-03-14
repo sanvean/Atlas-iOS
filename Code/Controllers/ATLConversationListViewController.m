@@ -108,7 +108,7 @@ NSString *const ATLConversationTableViewAccessibilityIdentifier = @"Conversation
     self.tableView.accessibilityIdentifier = ATLConversationTableViewAccessibilityIdentifier;
     self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
     
-    self.searchBar = [[UISearchBar alloc] initWithFrame:CGRectZero];
+    /*self.searchBar = [[UISearchBar alloc] initWithFrame:CGRectZero];
     [self.searchBar sizeToFit];
     self.searchBar.translucent = NO;
     self.searchBar.accessibilityLabel = @"Search Bar";
@@ -118,17 +118,17 @@ NSString *const ATLConversationTableViewAccessibilityIdentifier = @"Conversation
     self.searchController = [[UISearchDisplayController alloc] initWithSearchBar:self.searchBar contentsController:self];
     self.searchController.delegate = self;
     self.searchController.searchResultsDelegate = self;
-    self.searchController.searchResultsDataSource = self;
+    self.searchController.searchResultsDataSource = self;*/
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
     
-    // Hide the search bar
     if (!self.hasAppeared) {
-        CGFloat contentOffset = self.tableView.contentOffset.y + self.searchBar.frame.size.height;
-        self.tableView.contentOffset = CGPointMake(0, contentOffset);
+        // Hide the search bar
+        //CGFloat contentOffset = self.tableView.contentOffset.y + self.searchBar.frame.size.height;
+        //self.tableView.contentOffset = CGPointMake(0, contentOffset);
         self.tableView.rowHeight = self.rowHeight;
         [self.tableView registerClass:self.cellClass forCellReuseIdentifier:ATLConversationCellReuseIdentifier];
         if (self.allowsEditing) [self addEditButton];
