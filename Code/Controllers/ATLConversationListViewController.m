@@ -273,18 +273,33 @@ NSString *const ATLConversationTableViewAccessibilityIdentifier = @"Conversation
     for (NSNumber *deletionMode in self.deletionModes) {
         NSString *actionString;
         UIColor *actionColor;
-        switch (deletionMode.integerValue) {
-            case LYRDeletionModeLocal:
-                actionString = @"Local";
-                actionColor = [UIColor redColor];
-                break;
-            case LYRDeletionModeAllParticipants:
-                actionString = @"Global";
-                actionColor = [UIColor grayColor];
-                break;
-
-            default:
-                break;
+        if ([self.dataSource respondsToSelector:@selector(conversationListViewController:textForButtonWithDeletionMode:)]) {
+            actionString = [self.dataSource conversationListViewController:self textForButtonWithDeletionMode:deletionMode.integerValue];
+        } else {
+            switch (deletionMode.integerValue) {
+                case LYRDeletionModeLocal:
+                    actionString = @"Local";
+                    break;
+                case LYRDeletionModeAllParticipants:
+                    actionString = @"Global";
+                    break;
+                default:
+                    break;
+            }
+        }
+        if ([self.dataSource respondsToSelector:@selector(conversationListViewController:colorForButtonWithDeletionMode:)]) {
+            actionColor = [self.dataSource conversationListViewController:self colorForButtonWithDeletionMode:deletionMode.integerValue];
+        } else {
+            switch (deletionMode.integerValue) {
+                case LYRDeletionModeLocal:
+                    actionColor = [UIColor redColor];
+                    break;
+                case LYRDeletionModeAllParticipants:
+                    actionColor = [UIColor grayColor];
+                    break;
+                default:
+                    break;
+            }
         }
         UITableViewRowAction *deleteAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault title:actionString handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
             [self deleteConversationAtIndexPath:indexPath withDeletionMode:deletionMode.integerValue];
