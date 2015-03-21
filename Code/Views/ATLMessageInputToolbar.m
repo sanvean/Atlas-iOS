@@ -60,12 +60,12 @@ static CGFloat const ATLButtonHeight = 28.0f;
         self.translatesAutoresizingMaskIntoConstraints = NO;
         self.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 
-        self.leftAccessoryButton = [[UIButton alloc] init];
+        /*self.leftAccessoryButton = [[UIButton alloc] init];
         self.leftAccessoryButton.accessibilityLabel = ATLMessageInputToolbarCameraButton;
         self.leftAccessoryButton.contentMode = UIViewContentModeScaleAspectFit;
         [self.leftAccessoryButton setImage:[UIImage imageNamed:@"camera_dark"] forState:UIControlStateNormal];
         [self.leftAccessoryButton addTarget:self action:@selector(leftAccessoryButtonTapped) forControlEvents:UIControlEventTouchUpInside];
-        [self addSubview:self.leftAccessoryButton];
+        [self addSubview:self.leftAccessoryButton];*/
         
         self.textInputView = [[ATLMessageComposeTextView alloc] init];
         self.textInputView.accessibilityLabel = ATLMessageInputToolbarTextInputView;
@@ -97,9 +97,12 @@ static CGFloat const ATLButtonHeight = 28.0f;
     CGRect rightButtonFrame = self.rightAccessoryButton.frame;
     CGRect textViewFrame = self.textInputView.frame;
 
-    leftButtonFrame.size.width = ATLLeftAccessoryButtonWidth;
-    leftButtonFrame.size.height = ATLButtonHeight;
-    leftButtonFrame.origin.x = ATLLeftButtonHorizontalMargin;
+    // Only calculate when leftAccessoryButton is available
+    if (self.leftAccessoryButton) {
+        leftButtonFrame.size.width = ATLLeftAccessoryButtonWidth;
+        leftButtonFrame.size.height = ATLButtonHeight;
+        leftButtonFrame.origin.x = ATLLeftButtonHorizontalMargin;
+    }
 
     rightButtonFrame.size.width = ATLRightAccessoryButtonWidth;
     rightButtonFrame.size.height = ATLButtonHeight;
@@ -116,9 +119,12 @@ static CGFloat const ATLButtonHeight = 28.0f;
     frame.size.height = CGRectGetHeight(textViewFrame) + ATLVerticalMargin * 2;
     frame.origin.y -= frame.size.height - CGRectGetHeight(self.frame);
  
+    // Check if leftAccessoryButton is available.
+    CGRect rectToCalculateY = (self.leftAccessoryButton) ? leftButtonFrame : rightButtonFrame;
+    
     // Only calculate button centerY once to anchor it to bottom of bar.
     if (!self.buttonCenterY) {
-        self.buttonCenterY = (CGRectGetHeight(frame) - CGRectGetHeight(leftButtonFrame)) / 2;
+        self.buttonCenterY = (CGRectGetHeight(frame) - CGRectGetHeight(rectToCalculateY)) / 2;
     }
     leftButtonFrame.origin.y = frame.size.height - leftButtonFrame.size.height - self.buttonCenterY;
     rightButtonFrame.origin.y = frame.size.height - rightButtonFrame.size.height - self.buttonCenterY;
@@ -296,20 +302,23 @@ static CGFloat const ATLButtonHeight = 28.0f;
 
 - (void)configureRightAccessoryButtonState
 {
-    if (self.textInputView.text.length) {
-        self.rightAccessoryButton.accessibilityLabel = ATLMessageInputToolbarSendButton;
-        [self.rightAccessoryButton setImage:nil forState:UIControlStateNormal];
-        self.rightAccessoryButton.contentEdgeInsets = UIEdgeInsetsMake(2, 0, 0, 0);
-        self.rightAccessoryButton.titleLabel.font = [UIFont boldSystemFontOfSize:17];
-        [self.rightAccessoryButton setTitle:@"Send" forState:UIControlStateNormal];
-        [self.rightAccessoryButton setTitleColor:[UIColor grayColor] forState:UIControlStateDisabled];
-        [self.rightAccessoryButton setTitleColor:ATLBlueColor() forState:UIControlStateNormal];
-    } else {
+    //Only Show Send button
+    //if (self.textInputView.text.length) {
+    
+    self.rightAccessoryButton.accessibilityLabel = ATLMessageInputToolbarSendButton;
+    [self.rightAccessoryButton setImage:nil forState:UIControlStateNormal];
+    self.rightAccessoryButton.contentEdgeInsets = UIEdgeInsetsMake(2, 0, 0, 0);
+    self.rightAccessoryButton.titleLabel.font = [UIFont boldSystemFontOfSize:17];
+    [self.rightAccessoryButton setTitle:@"Send" forState:UIControlStateNormal];
+    [self.rightAccessoryButton setTitleColor:[UIColor grayColor] forState:UIControlStateDisabled];
+    [self.rightAccessoryButton setTitleColor:[UIColor colorWithRed:1.000f green:0.129f blue:0.258f alpha:1.00f] forState:UIControlStateNormal];
+    
+    /*} else {
         self.rightAccessoryButton.accessibilityLabel = ATLMessageInputToolbarLocationButton;
         [self.rightAccessoryButton setTitle:nil forState:UIControlStateNormal];
         self.rightAccessoryButton.contentEdgeInsets = UIEdgeInsetsZero;
         [self.rightAccessoryButton setImage:[UIImage imageNamed:@"location_dark"] forState:UIControlStateNormal];
-    }
+    }*/
 }
 
 @end
