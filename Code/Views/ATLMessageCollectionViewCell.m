@@ -102,17 +102,19 @@ CGFloat const ATLMessageCellHorizontalMargin = 16.0f;
 - (void)presentMessage:(LYRMessage *)message;
 {
     self.message = message;
-    LYRMessagePart *messagePart = message.parts.firstObject;
+    //LYRMessagePart *messagePart = message.parts.firstObject;
     
     if ([self messageContainsTextContent]) {
         [self configureBubbleViewForTextContent];
-    } else if ([messagePart.MIMEType isEqualToString:ATLMIMETypeImageJPEG]) {
+    }
+    /* Only show text content
+    else if ([messagePart.MIMEType isEqualToString:ATLMIMETypeImageJPEG]) {
         [self configureBubbleViewForImageContent];
     }else if ([messagePart.MIMEType isEqualToString:ATLMIMETypeImagePNG]) {
         [self configureBubbleViewForImageContent];
     } else if ([messagePart.MIMEType isEqualToString:ATLMIMETypeLocation]) {
         [self configureBubbleViewForLocationContent];
-    }
+    }*/
 }
 
 - (void)configureBubbleViewForTextContent
