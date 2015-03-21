@@ -200,7 +200,8 @@ static NSString *const ATLPushNotificationSoundName = @"layerbell.caf";
     // Configure avatar image display
     NSMutableSet *otherParticipantIDs = [self.conversation.participants mutableCopy];
     if (self.layerClient.authenticatedUserID) [otherParticipantIDs removeObject:self.layerClient.authenticatedUserID];
-    self.shouldDisplayAvatarItem = otherParticipantIDs.count > 1;
+    //self.shouldDisplayAvatarItem = otherParticipantIDs.count > 1;
+    self.shouldDisplayAvatarItem = YES;
     
     // Configure message bar button enablement
     BOOL shouldEnableButton = self.conversation ? YES : NO;
