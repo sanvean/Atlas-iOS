@@ -536,8 +536,13 @@ static NSString *const ATLPushNotificationSoundName = @"layerbell.caf";
 - (LYRMessage *)messageForMessageParts:(NSArray *)parts pushText:(NSString *)pushText;
 {
     NSString *senderName = [[self participantForIdentifier:self.layerClient.authenticatedUserID] fullName];
-    NSDictionary *pushOptions = @{LYRMessageOptionsPushNotificationAlertKey : [NSString stringWithFormat:@"%@: %@", senderName, pushText],
-                                  LYRMessageOptionsPushNotificationSoundNameKey : ATLPushNotificationSoundName};
+    
+    NSString *notificationText = NSLocalizedString(@"SENT_YOU_A_MESSAGE", nil);
+    notificationText = [NSString stringWithFormat: notificationText, senderName];
+
+    NSDictionary *pushOptions = @{LYRMessageOptionsPushNotificationAlertKey : notificationText,
+                                  LYRMessageOptionsPushNotificationSoundNameKey : @"default"
+                                  };
     NSError *error;
     LYRMessage *message = [self.layerClient newMessageWithParts:parts options:pushOptions error:&error];
     if (error) {
