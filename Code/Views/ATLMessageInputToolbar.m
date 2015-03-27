@@ -145,7 +145,9 @@ static CGFloat const ATLButtonHeight = 28.0f;
 
 - (void)paste:(id)sender
 {
-    NSArray *images = [UIPasteboard generalPasteboard].images;
+    // Block Photo Paste
+    //
+    /*NSArray *images = [UIPasteboard generalPasteboard].images;
     if (images.count > 0) {
         for (UIImage *image in images) {
             ATLMediaAttachment *mediaAttachment = [ATLMediaAttachment mediaAttachmentWithImage:image
@@ -155,6 +157,7 @@ static CGFloat const ATLButtonHeight = 28.0f;
         }
         return;
     }
+    */
 }
 
 #pragma mark - Public Methods
