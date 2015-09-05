@@ -24,6 +24,8 @@
 #import "LYRClientMock.h"
 #import "ATLSampleConversationListViewController.h"
 
+extern NSString *const ATLAvatarImageViewAccessibilityLabel;
+
 @interface ATLConversationListViewController ()
 
 @property (nonatomic) LYRQueryController *queryController;
@@ -50,15 +52,14 @@
 
 - (void)tearDown
 {
+    [super tearDown];
+    [tester waitForAnimationsToFinish];
     [self.testInterface dismissPresentedViewController];
-    self.viewController.queryController = nil;
-    self.viewController = nil;
+    if (self.viewController) self.viewController = nil;
     
     [[LYRMockContentStore sharedStore] resetContentStore];
     [self resetAppearance];
     self.testInterface = nil;
-    
-    [super tearDown];
 }
 
 - (void)testToVerifyConversationListBaseUI
@@ -148,7 +149,7 @@
     [tester tapViewWithAccessibilityLabel:[NSString stringWithFormat:@"Delete %@", mockUser3.fullName]];
     [self deleteConversation:conversation3 deletionMode:LYRDeletionModeLocal];
     
-    LYRQuery *query = [LYRQuery queryWithClass:[LYRConversation class]];
+    LYRQuery *query = [LYRQuery queryWithQueryableClass:[LYRConversation class]];
     NSError *error;
     NSOrderedSet *conversations = [self.testInterface.layerClient executeQuery:query error:&error];
     expect(error).to.beNil;
@@ -296,6 +297,7 @@
     }] conversationListViewController:[OCMArg any] avatarItemForConversation:[OCMArg any]];
     
     conversation = (LYRConversation *)[self newConversationWithMockUser:mockUser1 lastMessageText:@"Test Message"];
+    [delegateMock verify];
 }
 
 #pragma mark - ATLConversationListViewControllerDelegate
@@ -325,7 +327,6 @@
     [tester tapViewWithAccessibilityLabel:[self.testInterface conversationLabelForConversation:conversation1]];
     [delegateMock verify];
 }
-
 
 - (void)testToVerifyDelegateIsNotifiedOfGlobalConversationDeletion
 {
@@ -459,6 +460,68 @@
     
     UIView *deleteButton = [tester waitForViewWithAccessibilityLabel:@"Test"];
     expect(deleteButton.backgroundColor).to.equal([UIColor greenColor]);
+}
+
+- (void)testToVerifyDefaultQueryConfigurationDataSourceMethod
+{
+    self.viewController = [ATLConversationListViewController conversationListViewControllerWithLayerClient:(LYRClient *)self.testInterface.layerClient];
+    self.viewController.allowsEditing = YES;
+    
+    id delegateMock = OCMProtocolMock(@protocol(ATLConversationListViewControllerDataSource));
+    self.viewController.dataSource = delegateMock;
+    
+    [[[delegateMock expect] andDo:^(NSInvocation *invocation) {
+        ATLConversationListViewController *controller;
+        [invocation getArgument:&controller atIndex:2];
+        expect(controller).to.equal(self.viewController);
+        
+        LYRQuery *query;
+        [invocation getArgument:&query atIndex:3];
+        expect(query).toNot.beNil();
+        
+        [invocation setReturnValue:&query];
+    }] conversationListViewController:[OCMArg any] willLoadWithQuery:[OCMArg any]];
+    
+    [self setRootViewController:self.viewController];
+    [delegateMock verifyWithDelay:1];
+}
+
+- (void)testToVerifyQueryConfigurationTakesEffect
+{
+    self.viewController = [ATLConversationListViewController conversationListViewControllerWithLayerClient:(LYRClient *)self.testInterface.layerClient];
+    self.viewController.allowsEditing = YES;
+    
+    id delegateMock = OCMProtocolMock(@protocol(ATLConversationListViewControllerDataSource));
+    self.viewController.dataSource = delegateMock;
+    
+    __block NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"identifier" ascending:YES];
+    [[[delegateMock expect] andDo:^(NSInvocation *invocation) {
+        ATLConversationListViewController *controller;
+        [invocation getArgument:&controller atIndex:2];
+        expect(controller).to.equal(self.viewController);
+        
+        LYRQuery *query;
+        [invocation getArgument:&query atIndex:3];
+        expect(query).toNot.beNil();
+        
+        query.sortDescriptors = @[sortDescriptor];
+        [invocation setReturnValue:&query];
+    }] conversationListViewController:[OCMArg any] willLoadWithQuery:[OCMArg any]];
+    
+    [self setRootViewController:self.viewController];
+    [delegateMock verifyWithDelay:2];
+    
+    expect(self.viewController.queryController.query.sortDescriptors).will.contain(sortDescriptor);
+}
+
+- (void)testToVerifyAvatarImageURLLoad
+{
+    self.viewController = [ATLSampleConversationListViewController conversationListViewControllerWithLayerClient:(LYRClient *)self.testInterface.layerClient];
+    self.viewController.displaysAvatarItem = YES;
+    [self setRootViewController:self.viewController];
+    
+    ATLAvatarImageView *imageView = (ATLAvatarImageView *)[tester waitForViewWithAccessibilityLabel:ATLAvatarImageViewAccessibilityLabel];
+    expect(imageView.image).will.beTruthy;
 }
 
 - (LYRConversationMock *)newConversationWithMockUser:(ATLUserMock *)mockUser lastMessageText:(NSString *)lastMessageText
