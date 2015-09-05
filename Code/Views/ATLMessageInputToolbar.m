@@ -68,15 +68,8 @@ static CGFloat const ATLButtonHeight = 28.0f;
         self.accessibilityLabel = ATLMessageInputToolbarAccessibilityLabel;
         self.translatesAutoresizingMaskIntoConstraints = NO;
         self.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-<<<<<<< HEAD
-
-        /*self.leftAccessoryButton = [[UIButton alloc] init];
-        self.leftAccessoryButton.accessibilityLabel = ATLMessageInputToolbarCameraButton;
-        self.leftAccessoryButton.contentMode = UIViewContentModeScaleAspectFit;
-        [self.leftAccessoryButton setImage:[UIImage imageNamed:@"camera_dark"] forState:UIControlStateNormal];
-=======
         
-        self.leftAccessoryImage = [UIImage imageNamed:@"AtlasResource.bundle/camera_dark"];
+        /*self.leftAccessoryImage = [UIImage imageNamed:@"AtlasResource.bundle/camera_dark"];
         self.rightAccessoryImage = [UIImage imageNamed:@"AtlasResource.bundle/location_dark"];
         self.displaysRightAccessoryImage = YES;
         self.firstAppearance = YES;
@@ -85,7 +78,6 @@ static CGFloat const ATLButtonHeight = 28.0f;
         self.leftAccessoryButton.accessibilityLabel = ATLMessageInputToolbarCameraButton;
         self.leftAccessoryButton.contentMode = UIViewContentModeScaleAspectFit;
         [self.leftAccessoryButton setImage:self.leftAccessoryImage forState:UIControlStateNormal];
->>>>>>> layerhq/master
         [self.leftAccessoryButton addTarget:self action:@selector(leftAccessoryButtonTapped) forControlEvents:UIControlEventTouchUpInside];
         [self addSubview:self.leftAccessoryButton];*/
         
@@ -127,14 +119,6 @@ static CGFloat const ATLButtonHeight = 28.0f;
     CGRect rightButtonFrame = self.rightAccessoryButton.frame;
     CGRect textViewFrame = self.textInputView.frame;
 
-<<<<<<< HEAD
-    // Only calculate when leftAccessoryButton is available
-    if (self.leftAccessoryButton) {
-        leftButtonFrame.size.width = ATLLeftAccessoryButtonWidth;
-        leftButtonFrame.size.height = ATLButtonHeight;
-        leftButtonFrame.origin.x = ATLLeftButtonHorizontalMargin;
-    }
-=======
     if (!self.leftAccessoryButton) {
         leftButtonFrame.size.width = 0;
     } else {
@@ -143,7 +127,6 @@ static CGFloat const ATLButtonHeight = 28.0f;
     
     leftButtonFrame.size.height = ATLButtonHeight;
     leftButtonFrame.origin.x = ATLLeftButtonHorizontalMargin;
->>>>>>> layerhq/master
 
     rightButtonFrame.size.width = ATLRightAccessoryButtonWidth;
     rightButtonFrame.size.height = ATLButtonHeight;
@@ -186,27 +169,14 @@ static CGFloat const ATLButtonHeight = 28.0f;
 
 - (void)paste:(id)sender
 {
-<<<<<<< HEAD
     // Block Photo Paste
-    //
-    /*NSArray *images = [UIPasteboard generalPasteboard].images;
-    if (images.count > 0) {
-        for (UIImage *image in images) {
-            ATLMediaAttachment *mediaAttachment = [ATLMediaAttachment mediaAttachmentWithImage:image
-                                                                                      metadata:nil
-                                                                                 thumbnailSize:ATLDefaultThumbnailSize];
-            [self insertMediaAttachment:mediaAttachment];
-        }
-        return;
-=======
-    NSData *imageData = [[UIPasteboard generalPasteboard] dataForPasteboardType:ATLPasteboardImageKey];
+    /*NSData *imageData = [[UIPasteboard generalPasteboard] dataForPasteboardType:ATLPasteboardImageKey];
     if (imageData) {
         UIImage *image = [UIImage imageWithData:imageData];
         ATLMediaAttachment *mediaAttachment = [ATLMediaAttachment mediaAttachmentWithImage:image
                                                                                   metadata:nil
                                                                              thumbnailSize:ATLDefaultThumbnailSize];
         [self insertMediaAttachment:mediaAttachment withEndLineBreak:YES];
->>>>>>> layerhq/master
     }
     */
 }
@@ -390,29 +360,13 @@ static CGFloat const ATLButtonHeight = 28.0f;
 
 - (void)configureRightAccessoryButtonState
 {
-<<<<<<< HEAD
-    //Only Show Send button
-    //if (self.textInputView.text.length) {
-    
-    self.rightAccessoryButton.accessibilityLabel = ATLMessageInputToolbarSendButton;
-    [self.rightAccessoryButton setImage:nil forState:UIControlStateNormal];
-    self.rightAccessoryButton.contentEdgeInsets = UIEdgeInsetsMake(2, 0, 0, 0);
-    self.rightAccessoryButton.titleLabel.font = [UIFont boldSystemFontOfSize:17];
-    [self.rightAccessoryButton setTitle:@"Send" forState:UIControlStateNormal];
-    [self.rightAccessoryButton setTitleColor:[UIColor grayColor] forState:UIControlStateDisabled];
-    [self.rightAccessoryButton setTitleColor:[UIColor colorWithRed:1.000f green:0.129f blue:0.258f alpha:1.00f] forState:UIControlStateNormal];
-    
-    /*} else {
-        self.rightAccessoryButton.accessibilityLabel = ATLMessageInputToolbarLocationButton;
-        [self.rightAccessoryButton setTitle:nil forState:UIControlStateNormal];
-        self.rightAccessoryButton.contentEdgeInsets = UIEdgeInsetsZero;
-        [self.rightAccessoryButton setImage:[UIImage imageNamed:@"location_dark"] forState:UIControlStateNormal];
-    }*/
-=======
+    // Only Show Send button
     if (self.textInputView.text.length) {
         [self configureRightAccessoryButtonForText];
         self.rightAccessoryButton.enabled = YES;
-    } else {
+    }
+    
+    /*else {
         if (self.displaysRightAccessoryImage) {
             [self configureRightAccessoryButtonForImage];
             self.rightAccessoryButton.enabled = YES;
@@ -420,7 +374,7 @@ static CGFloat const ATLButtonHeight = 28.0f;
             [self configureRightAccessoryButtonForText];
             self.rightAccessoryButton.enabled = NO;
         }
-    }
+    }*/
 }
 
 - (void)configureRightAccessoryButtonForText
@@ -437,7 +391,6 @@ static CGFloat const ATLButtonHeight = 28.0f;
     } else {
         self.rightAccessoryButton.enabled = YES;
     }
->>>>>>> layerhq/master
 }
 
 - (void)configureRightAccessoryButtonForImage
