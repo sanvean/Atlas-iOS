@@ -58,7 +58,7 @@ static NSString *const ATLDefaultPushAlertGIF = @"sent you a GIF.";
 static NSString *const ATLDefaultPushAlertImage = @"sent you a photo.";
 static NSString *const ATLDefaultPushAlertLocation = @"sent you a location.";
 static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
-static NSInteger const ATLPhotoActionSheet = 1000;
+//static NSInteger const ATLPhotoActionSheet = 1000;
 
 + (NSCache *)sharedMediaAttachmentCache
 {
