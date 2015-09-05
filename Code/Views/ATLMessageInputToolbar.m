@@ -361,10 +361,10 @@ static CGFloat const ATLButtonHeight = 28.0f;
 - (void)configureRightAccessoryButtonState
 {
     // Only Show Send button
-    if (self.textInputView.text.length) {
+    //if (self.textInputView.text.length) {
         [self configureRightAccessoryButtonForText];
         self.rightAccessoryButton.enabled = YES;
-    }
+    //}
     
     /*else {
         if (self.displaysRightAccessoryImage) {
