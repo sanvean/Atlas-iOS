@@ -30,11 +30,7 @@
 #import "ATLMediaAttachment.h"
 #import "ATLLocationManager.h"
 
-<<<<<<< HEAD
-@interface ATLConversationViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ATLMessageInputToolbarDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, LYRQueryControllerDelegate, CLLocationManagerDelegate>
-=======
-@interface ATLConversationViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ATLMessageInputToolbarDelegate, UIActionSheetDelegate, CLLocationManagerDelegate>
->>>>>>> layerhq/master
+@interface ATLConversationViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ATLMessageInputToolbarDelegate, CLLocationManagerDelegate>
 
 @property (nonatomic) ATLConversationDataSource *conversationDataSource;
 @property (nonatomic, readwrite) LYRQueryController *queryController;
@@ -263,12 +259,7 @@ static NSInteger const ATLPhotoActionSheet = 1000;
     // Configure avatar image display
     NSMutableSet *otherParticipantIDs = [self.conversation.participants mutableCopy];
     if (self.layerClient.authenticatedUserID) [otherParticipantIDs removeObject:self.layerClient.authenticatedUserID];
-<<<<<<< HEAD
-    //self.shouldDisplayAvatarItem = otherParticipantIDs.count > 1;
-    self.shouldDisplayAvatarItem = YES;
-=======
     self.shouldDisplayAvatarItem = (otherParticipantIDs.count > 1) ? YES : self.shouldDisplayAvatarItemForOneOtherParticipant;
->>>>>>> layerhq/master
     
     // Configure message bar button enablement
     BOOL shouldEnableButton = self.conversation ? YES : NO;
@@ -569,11 +560,8 @@ static NSInteger const ATLPhotoActionSheet = 1000;
                                                destructiveButtonTitle:nil
                                                     otherButtonTitles:ATLLocalizedString(@"atl.conversation.toolbar.actionsheet.takephoto.key", @"Take Photo", nil), ATLLocalizedString(@"atl.conversation.toolbar.actionsheet.lastphoto.key", @"Last Photo Taken", nil), ATLLocalizedString(@"atl.conversation.toolbar.actionsheet.library.key", @"Photo Library", nil), nil];
     [actionSheet showInView:self.view];
-<<<<<<< HEAD
-    */
-=======
     actionSheet.tag = ATLPhotoActionSheet;
->>>>>>> layerhq/master
+    */
 }
 
 - (void)messageInputToolbar:(ATLMessageInputToolbar *)messageInputToolbar didTapRightAccessoryButton:(UIButton *)rightAccessoryButton
@@ -620,7 +608,6 @@ static NSInteger const ATLPhotoActionSheet = 1000;
 - (LYRMessage *)messageForMessageParts:(NSArray *)parts MIMEType:(NSString *)MIMEType pushText:(NSString *)pushText;
 {
     NSString *senderName = [[self participantForIdentifier:self.layerClient.authenticatedUserID] fullName];
-<<<<<<< HEAD
     
     NSString *notificationText = NSLocalizedString(@"SENT_YOU_A_MESSAGE", nil);
     notificationText = [NSString stringWithFormat: notificationText, senderName];
@@ -628,25 +615,7 @@ static NSInteger const ATLPhotoActionSheet = 1000;
     NSDictionary *pushOptions = @{LYRMessageOptionsPushNotificationAlertKey : notificationText,
                                   LYRMessageOptionsPushNotificationSoundNameKey : @"default"
                                   };
-=======
-    NSString *completePushText;
-    if (!pushText) {
-        if ([MIMEType isEqualToString:ATLMIMETypeImageGIF]) {
-            completePushText = [NSString stringWithFormat:@"%@ %@", senderName, ATLDefaultPushAlertGIF];
-        } else if ([MIMEType isEqualToString:ATLMIMETypeImagePNG] || [MIMEType isEqualToString:ATLMIMETypeImageJPEG]) {
-            completePushText = [NSString stringWithFormat:@"%@ %@", senderName, ATLDefaultPushAlertImage];
-        } else if ([MIMEType isEqualToString:ATLMIMETypeLocation]) {
-            completePushText = [NSString stringWithFormat:@"%@ %@", senderName, ATLDefaultPushAlertLocation];
-        } else {
-            completePushText = [NSString stringWithFormat:@"%@ %@", senderName, ATLDefaultPushAlertText];
-        }
-    } else {
-        completePushText = [NSString stringWithFormat:@"%@: %@", senderName, pushText];
-    }
 
-    NSDictionary *pushOptions = @{LYRMessageOptionsPushNotificationAlertKey : completePushText,
-                                  LYRMessageOptionsPushNotificationSoundNameKey : ATLPushNotificationSoundName};
->>>>>>> layerhq/master
     NSError *error;
     LYRMessage *message = [self.layerClient newMessageWithParts:parts options:pushOptions error:&error];
     if (error) {
