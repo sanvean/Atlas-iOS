@@ -244,8 +244,10 @@
 /**
  @abstract The controller used to display search results.
  */
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated"
 @property (nonatomic, readonly) UISearchDisplayController *searchController;
-
+#pragma clang diagnostic pop
 
 ///------------------------------
 /// @name Reloading Conversations
