@@ -619,10 +619,13 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
     NSString *notificationText = NSLocalizedString(@"SENT_YOU_A_MESSAGE", nil);
     notificationText = [NSString stringWithFormat: notificationText, senderName];
 
-    NSDictionary *pushOptions = @{LYRMessageOptionsPushNotificationAlertKey : notificationText,
-                                  LYRMessageOptionsPushNotificationSoundNameKey : @"default"
-                                  };
-
+    LYRPushNotificationConfiguration *notificationConfig = [[LYRPushNotificationConfiguration alloc] init];
+    
+    notificationConfig.alert = notificationText;
+    notificationConfig.sound = @"default";
+    
+    NSDictionary *pushOptions = @{LYRMessageOptionsPushNotificationConfigurationKey : notificationConfig };
+    
     NSError *error;
     LYRMessage *message = [self.layerClient newMessageWithParts:parts options:pushOptions error:&error];
     if (error) {
