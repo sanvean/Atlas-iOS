@@ -232,7 +232,14 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
     if (!self.conversation) return;
     
     LYRQuery *query = [LYRQuery queryWithQueryableClass:[LYRMessage class]];
-    query.predicate = [LYRPredicate predicateWithProperty:@"conversation" predicateOperator:LYRPredicateOperatorIsEqualTo value:self.conversation];
+
+    LYRPredicate *conversationPredicate = [LYRPredicate predicateWithProperty:@"conversation" predicateOperator:LYRPredicateOperatorIsEqualTo value:self.conversation];
+
+    // Filter out all non-plain text messages (e.g. JSON for Like/Reject, Location)
+    LYRPredicate *mimeTypePredicate = [LYRPredicate predicateWithProperty:@"parts.MIMEType" predicateOperator:LYRPredicateOperatorIsEqualTo value:@"text/plain"];
+    
+    query.predicate = [LYRCompoundPredicate compoundPredicateWithType:LYRCompoundPredicateTypeAnd subpredicates:@[conversationPredicate, mimeTypePredicate]];
+
     query.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"position" ascending:YES]];
     
     if ([self.dataSource respondsToSelector:@selector(conversationViewController:willLoadWithQuery:)]) {
