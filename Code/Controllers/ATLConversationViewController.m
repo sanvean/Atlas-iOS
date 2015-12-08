@@ -20,6 +20,7 @@
 
 #import <AssetsLibrary/AssetsLibrary.h>
 #import <MobileCoreServices/MobileCoreServices.h>
+#import <MediaPlayer/MediaPlayer.h>
 #import "ATLConversationViewController.h"
 #import "ATLConversationCollectionView.h"
 #import "ATLConstants.h"
@@ -29,6 +30,7 @@
 #import "ATLConversationDataSource.h"
 #import "ATLMediaAttachment.h"
 #import "ATLLocationManager.h"
+@import AVFoundation;
 
 @interface ATLConversationViewController () <UICollectionViewDataSource, UICollectionViewDelegate, ATLMessageInputToolbarDelegate, CLLocationManagerDelegate>
 
@@ -57,6 +59,7 @@ static NSString *const ATLPushNotificationSoundName = @"layerbell.caf";
 static NSString *const ATLDefaultPushAlertGIF = @"sent you a GIF.";
 static NSString *const ATLDefaultPushAlertImage = @"sent you a photo.";
 static NSString *const ATLDefaultPushAlertLocation = @"sent you a location.";
+static NSString *const ATLDefaultPushAlertVideo = @"sent you a video.";
 static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
 //static NSInteger const ATLPhotoActionSheet = 1000;
 
@@ -274,7 +277,7 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
     self.messageInputToolbar.leftAccessoryButton.enabled = shouldEnableButton;
     
     // Mark all messages as read if needed
-    if (self.conversation.lastMessage) {
+    if (self.conversation.lastMessage && self.marksMessagesAsRead) {
         [self.conversation markAllMessagesAsRead:nil];
     }
 }
@@ -299,11 +302,10 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
     if (section == ATLMoreMessagesSection) return 0;
-
     // Each message is represented by one cell no matter how many parts it has.
     return 1;
 }
- 
+
 /**
  Atlas - The `ATLConversationViewController` component uses `LYRMessage` objects to represent sections.
  */
@@ -430,7 +432,7 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
     } else {
         [cell updateWithSender:nil];
     }
-    if (message.isUnread && [[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
+    if (message.isUnread && [[UIApplication sharedApplication] applicationState] == UIApplicationStateActive && self.marksMessagesAsRead) {
         [message markAsRead:nil];
     }
 }
@@ -493,7 +495,6 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
     
     LYRMessage *message = [self.conversationDataSource messageAtCollectionViewSection:section];
     if ([message.sender.userID isEqualToString:self.layerClient.authenticatedUserID]) return NO;
-
     if (section > ATLNumberOfSectionsBeforeFirstMessageSection) {
         LYRMessage *previousMessage = [self.conversationDataSource messageAtCollectionViewSection:section - 1];
         if ([previousMessage.sender.userID isEqualToString:message.sender.userID]) {
@@ -509,7 +510,6 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
     NSInteger lastQueryControllerRow = [self.conversationDataSource.queryController numberOfObjectsInSection:0] - 1;
     NSInteger lastSection = [self.conversationDataSource collectionViewSectionForQueryControllerRow:lastQueryControllerRow];
     if (section != lastSection) return NO;
-
     LYRMessage *message = [self.conversationDataSource messageAtCollectionViewSection:section];
     if (![message.sender.userID isEqualToString:self.layerClient.authenticatedUserID]) return NO;
     
@@ -534,16 +534,17 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
 - (BOOL)shouldDisplayAvatarItemAtIndexPath:(NSIndexPath *)indexPath
 {
     if (!self.shouldDisplayAvatarItem) return NO;
-   
     LYRMessage *message = [self.conversationDataSource messageAtCollectionViewIndexPath:indexPath];
-    if ([message.sender.userID isEqualToString:self.layerClient.authenticatedUserID] && !self.shouldDisplayAvatarItemForAuthenticatedUser) {
+    if (message.sender.userID == nil) {
         return NO;
     }
     
+    if ([message.sender.userID isEqualToString:self.layerClient.authenticatedUserID] && !self.shouldDisplayAvatarItemForAuthenticatedUser) {
+        return NO;
+    }
     if (![self shouldClusterMessageAtSection:indexPath.section] && self.avatarItemDisplayFrequency == ATLAvatarItemDisplayFrequencyCluster) {
         return YES;
     }
-   
     NSInteger lastQueryControllerRow = [self.conversationDataSource.queryController numberOfObjectsInSection:0] - 1;
     NSInteger lastSection = [self.conversationDataSource collectionViewSectionForQueryControllerRow:lastQueryControllerRow];
     if (indexPath.section < lastSection) {
@@ -560,12 +561,19 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
 
 - (void)messageInputToolbar:(ATLMessageInputToolbar *)messageInputToolbar didTapLeftAccessoryButton:(UIButton *)leftAccessoryButton
 {
+<<<<<<< HEAD
     /*
+=======
+    if (messageInputToolbar.textInputView.isFirstResponder) {
+        [messageInputToolbar.textInputView resignFirstResponder];
+    }
+    
+>>>>>>> layerhq/master
     UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
                                                              delegate:self
                                                     cancelButtonTitle:ATLLocalizedString(@"atl.conversation.toolbar.actionsheet.cancel.key", @"Cancel", nil)
                                                destructiveButtonTitle:nil
-                                                    otherButtonTitles:ATLLocalizedString(@"atl.conversation.toolbar.actionsheet.takephoto.key", @"Take Photo", nil), ATLLocalizedString(@"atl.conversation.toolbar.actionsheet.lastphoto.key", @"Last Photo Taken", nil), ATLLocalizedString(@"atl.conversation.toolbar.actionsheet.library.key", @"Photo Library", nil), nil];
+                                                    otherButtonTitles:ATLLocalizedString(@"atl.conversation.toolbar.actionsheet.takephoto.key", @"Take Photo/Video", nil), ATLLocalizedString(@"atl.conversation.toolbar.actionsheet.lastphoto.key", @"Last Photo/Video", nil), ATLLocalizedString(@"atl.conversation.toolbar.actionsheet.library.key", @"Photo/Video Library", nil), nil];
     [actionSheet showInView:self.view];
     actionSheet.tag = ATLPhotoActionSheet;
     */
@@ -576,8 +584,10 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
     if (!self.conversation) {
         return;
     }
+    
+    // If there's no content in the input field, send the location.
     NSOrderedSet *messages = [self messagesForMediaAttachments:messageInputToolbar.mediaAttachments];
-    if (messages && messages.count == 0 && messageInputToolbar.textInputView.text.length == 0) {
+    if (messages.count == 0 && messageInputToolbar.textInputView.text.length == 0) {
         [self sendLocationMessage];
     } else {
         for (LYRMessage *message in messages) {
@@ -615,6 +625,7 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
 - (LYRMessage *)messageForMessageParts:(NSArray *)parts MIMEType:(NSString *)MIMEType pushText:(NSString *)pushText;
 {
     NSString *senderName = [[self participantForIdentifier:self.layerClient.authenticatedUserID] fullName];
+<<<<<<< HEAD
     
     NSString *notificationText = NSLocalizedString(@"SENT_YOU_A_MESSAGE", nil);
     notificationText = [NSString stringWithFormat: notificationText, senderName];
@@ -631,6 +642,26 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
     if (error) {
         return nil;
     }
+=======
+    NSString *completePushText;
+    if (!pushText) {
+        if ([MIMEType isEqualToString:ATLMIMETypeImageGIF]) {
+            completePushText = [NSString stringWithFormat:@"%@ %@", senderName, ATLDefaultPushAlertGIF];
+        } else if ([MIMEType isEqualToString:ATLMIMETypeImagePNG] || [MIMEType isEqualToString:ATLMIMETypeImageJPEG]) {
+            completePushText = [NSString stringWithFormat:@"%@ %@", senderName, ATLDefaultPushAlertImage];
+        } else if ([MIMEType isEqualToString:ATLMIMETypeLocation]) {
+            completePushText = [NSString stringWithFormat:@"%@ %@", senderName, ATLDefaultPushAlertLocation];
+        } else if ([MIMEType isEqualToString:ATLMIMETypeVideoMP4]){
+            completePushText = [NSString stringWithFormat:@"%@ %@", senderName, ATLDefaultPushAlertVideo];
+        } else {
+            completePushText = [NSString stringWithFormat:@"%@ %@", senderName, ATLDefaultPushAlertText];
+        }
+    } else {
+        completePushText = [NSString stringWithFormat:@"%@: %@", senderName, pushText];
+    }
+    
+    LYRMessage *message = ATLMessageForParts(self.layerClient, parts, completePushText, ATLPushNotificationSoundName);
+>>>>>>> layerhq/master
     return message;
 }
 
@@ -645,7 +676,7 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
     }
 }
 
-#pragma mark - Location Message 
+#pragma mark - Location Message
 
 - (void)sendLocationMessage
 {
@@ -714,7 +745,9 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
     if (pickerSourceTypeAvailable) {
         UIImagePickerController *picker = [[UIImagePickerController alloc] init];
         picker.delegate = self;
+        picker.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:sourceType];
         picker.sourceType = sourceType;
+        picker.videoQuality = UIImagePickerControllerQualityTypeHigh;
         [self.navigationController presentViewController:picker animated:YES completion:nil];
     }
 }
@@ -735,24 +768,28 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
-    NSString *mediaType = info[UIImagePickerControllerMediaType];
-    if ([mediaType isEqualToString:(__bridge NSString *)kUTTypeImage]) {
-        NSURL *assetURL = (NSURL *)info[UIImagePickerControllerReferenceURL];
-        ATLMediaAttachment *mediaAttachment;
-        if (assetURL) {
-            mediaAttachment = [ATLMediaAttachment mediaAttachmentWithAssetURL:assetURL thumbnailSize:ATLDefaultThumbnailSize];
-        } else if (info[UIImagePickerControllerOriginalImage]) {
-            mediaAttachment = [ATLMediaAttachment mediaAttachmentWithImage:info[UIImagePickerControllerOriginalImage]
-                                                                  metadata:info[UIImagePickerControllerMediaMetadata]
-                                                             thumbnailSize:ATLDefaultThumbnailSize];
-        } else {
-            return;
-        }
+    ATLMediaAttachment *mediaAttachment;
+    if (info[UIImagePickerControllerMediaURL]) {
+        // Video recorded within the app or was picked and edited in
+        // the image picker.
+        NSURL *moviePath = [NSURL fileURLWithPath:(NSString *)[[info objectForKey:UIImagePickerControllerMediaURL] path]];
+        mediaAttachment = [ATLMediaAttachment mediaAttachmentWithFileURL:moviePath thumbnailSize:ATLDefaultThumbnailSize];
+    } else if (info[UIImagePickerControllerReferenceURL]) {
+        // Photo taken or video recorded within the app.
+        mediaAttachment = [ATLMediaAttachment mediaAttachmentWithAssetURL:info[UIImagePickerControllerReferenceURL] thumbnailSize:ATLDefaultThumbnailSize];
+    } else if (info[UIImagePickerControllerOriginalImage]) {
+        // Image picked from the image picker.
+        mediaAttachment = [ATLMediaAttachment mediaAttachmentWithImage:info[UIImagePickerControllerOriginalImage] metadata:info[UIImagePickerControllerMediaMetadata] thumbnailSize:ATLDefaultThumbnailSize];
+    } else {
+        return;
+    }
+    
+    if (mediaAttachment) {
         [self.messageInputToolbar insertMediaAttachment:mediaAttachment withEndLineBreak:YES];
     }
     [self.navigationController dismissViewControllerAnimated:YES completion:nil];
     [self.view becomeFirstResponder];
-
+    
     // Workaround for collection view not displayed on iOS 7.1.
     [self.collectionView setNeedsLayout];
 }
@@ -761,7 +798,7 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
 {
     [self.navigationController dismissViewControllerAnimated:YES completion:nil];
     [self.view becomeFirstResponder];
-
+    
     // Workaround for collection view not displayed on iOS 7.1.
     [self.collectionView setNeedsLayout];
 }
@@ -806,7 +843,7 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
 
 - (void)handleApplicationWillEnterForeground:(NSNotification *)notification
 {
-    if (self.conversation) {
+    if (self.conversation && self.marksMessagesAsRead) {
         NSError *error;
         BOOL success = [self.conversation markAllMessagesAsRead:&error];
         if (!success) {
@@ -890,13 +927,13 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
     if (CGRectEqualToRect(self.collectionView.frame, CGRectZero)) return;
     if (self.collectionView.isDragging) return;
     if (self.collectionView.isDecelerating) return;
-
+    
     CGFloat topOffset = -self.collectionView.contentInset.top;
     CGFloat distanceFromTop = self.collectionView.contentOffset.y - topOffset;
     CGFloat minimumDistanceFromTopToTriggerLoadingMore = 200;
     BOOL nearTop = distanceFromTop <= minimumDistanceFromTopToTriggerLoadingMore;
     if (!nearTop) return;
-
+    
     [self.conversationDataSource expandPaginationWindow];
 }
 
@@ -945,26 +982,26 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
 - (void)configureAddressBarForChangedParticipants
 {
     if (!self.addressBarController) return;
-
+    
     NSOrderedSet *existingParticipants = self.addressBarController.selectedParticipants;
     NSOrderedSet *existingParticipantIdentifiers = [existingParticipants valueForKey:@"participantIdentifier"];
-   
+    
     if (!existingParticipantIdentifiers && !self.conversation.participants) return;
     if ([existingParticipantIdentifiers.set isEqual:self.conversation.participants]) return;
-
+    
     NSMutableOrderedSet *removedIdentifiers = [NSMutableOrderedSet orderedSetWithOrderedSet:existingParticipantIdentifiers];
     [removedIdentifiers minusSet:self.conversation.participants];
-
+    
     NSMutableOrderedSet *addedIdentifiers = [NSMutableOrderedSet orderedSetWithSet:self.conversation.participants];
     [addedIdentifiers minusOrderedSet:existingParticipantIdentifiers];
     
     NSString *authenticatedUserID = self.layerClient.authenticatedUserID;
     if (authenticatedUserID) [addedIdentifiers removeObject:authenticatedUserID];
-
+    
     NSMutableOrderedSet *participantIdentifiers = [NSMutableOrderedSet orderedSetWithOrderedSet:existingParticipantIdentifiers];
     [participantIdentifiers minusOrderedSet:removedIdentifiers];
     [participantIdentifiers unionOrderedSet:addedIdentifiers];
-
+    
     NSOrderedSet *participants = [self participantsForIdentifiers:participantIdentifiers];
     self.addressBarController.selectedParticipants = participants;
 }
@@ -1004,7 +1041,7 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
             NSLog(@"LayerKit failed to execute query with error: %@", error);
             return;
         }
-
+        
         // Query for the all of the message identifiers in the above set where user == participantIdentifier
         LYRQuery *query = [LYRQuery queryWithQueryableClass:[LYRMessage class]];
         LYRPredicate *senderPredicate = [LYRPredicate predicateWithProperty:@"sender.userID" predicateOperator:LYRPredicateOperatorIsEqualTo value:participantIdentifier];
@@ -1016,7 +1053,7 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
             NSLog(@"LayerKit failed to execute query with error: %@", error);
             return;
         }
-
+        
         // Convert query controller index paths to collection view index paths
         NSDictionary *objectIdentifiersToIndexPaths = [self.conversationDataSource.queryController indexPathsForObjectsWithIdentifiers:messageIdentifiersToReload.set];
         NSArray *queryControllerIndexPaths = [objectIdentifiersToIndexPaths allValues];
@@ -1219,7 +1256,7 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
         } completion:^(BOOL finished) {
             dispatch_resume(self.animationQueue);
         }];
-    }    
+    }
     [self configureCollectionViewElements];
     
     if (shouldScrollToBottom)  {
@@ -1263,7 +1300,7 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
     if ([cell conformsToProtocol:@protocol(ATLMessagePresenting)]) {
         [self configureCell:(UICollectionViewCell<ATLMessagePresenting> *)cell forMessage:message indexPath:collectionViewIndexPath];
     }
-
+    
     // Find the header...
     for (ATLConversationCollectionViewHeader *header in self.sectionHeaders) {
         NSIndexPath *queryControllerIndexPath = [self.conversationDataSource.queryController indexPathForObject:header.message];
@@ -1273,7 +1310,7 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
             break;
         }
     }
-
+    
     // ...and the footer
     for (ATLConversationCollectionViewFooter *footer in self.sectionFooters) {
         NSIndexPath *queryControllerIndexPath = [self.conversationDataSource.queryController indexPathForObject:footer.message];
@@ -1323,7 +1360,7 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
 #pragma mark - NSNotification Center Registration
 
 - (void)atl_registerForNotifications
-{    
+{
     // Layer Notifications
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didReceiveTypingIndicator:) name:LYRConversationDidReceiveTypingIndicatorNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(layerClientObjectsDidChange:) name:LYRClientObjectsDidChangeNotification object:nil];

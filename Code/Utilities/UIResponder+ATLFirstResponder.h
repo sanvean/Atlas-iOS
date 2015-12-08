@@ -1,8 +1,8 @@
 //
-//  ATLLayerKitMock.h
+//  UIResponder+ATLFirstResponder.h
 //  Atlas
 //
-//  Created by Kevin Coleman on 12/8/14.
+//  Created by Kabir Mahal on 5/15/15.
 //  Copyright (c) 2015 Layer. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,14 +18,14 @@
 //  limitations under the License.
 //
 
-#import <Atlas/Atlas.h>
+#import <UIKit/UIKit.h>
 
-#import "LYRClientMock.h"
-#import "LYRConversationMock.h"
-#import "LYRMessageMock.h"
-#import "LYRMessagePartMock.h"
+/**
+ @abstract This category on `UIRResponder` finds the current first responder of the application.
+ @discussion This category is used in Atlas internally to override next responder status.
+ */
+@interface UIResponder (ATLFirstResponder)
 
-#import "LYRQueryControllerMock.h"
++ (id)atl_currentFirstResponder;
 
-#import "LYRMockContentStore.h"
-#import "ATLUserMock.h"
+@end

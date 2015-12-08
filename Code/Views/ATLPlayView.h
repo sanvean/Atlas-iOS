@@ -1,9 +1,9 @@
 //
-//  ATLLayerKitMock.h
+//  ATLUIProgressView.h
 //  Atlas
 //
-//  Created by Kevin Coleman on 12/8/14.
-//  Copyright (c) 2015 Layer. All rights reserved.
+//  Created by Dinesh Kakumani on 7/21/15.
+//  Copyright (c) 2015 Layer, Inc. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,14 +18,12 @@
 //  limitations under the License.
 //
 
-#import <Atlas/Atlas.h>
+#import <UIKit/UIKit.h>
 
-#import "LYRClientMock.h"
-#import "LYRConversationMock.h"
-#import "LYRMessageMock.h"
-#import "LYRMessagePartMock.h"
+/**
+ @abstract A custom view that displays a circular play button indicating that
+   the content below it is playable.
+ */
+@interface ATLPlayView : UIView
 
-#import "LYRQueryControllerMock.h"
-
-#import "LYRMockContentStore.h"
-#import "ATLUserMock.h"
+@end

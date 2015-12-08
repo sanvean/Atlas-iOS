@@ -18,6 +18,8 @@
 //  limitations under the License.
 //
 
+#define SYSTEM_VERSION_LESS_THAN(v) ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
+
 #import "ATLBaseConversationViewController.h"
 #import "ATLConversationView.h"
 
@@ -79,6 +81,7 @@ static CGFloat const ATLMaxScrollDistanceFromBottom = 150;
     // An apparent system bug causes a view controller to not be deallocated
     // if the view controller's own inputAccessoryView property is used.
     self.view.inputAccessoryView = self.messageInputToolbar;
+    self.messageInputToolbar.containerViewController = self;
     
     // Add typing indicator
     self.typingIndicatorController = [[ATLTypingIndicatorViewController alloc] init];
@@ -114,6 +117,12 @@ static CGFloat const ATLMaxScrollDistanceFromBottom = 150;
 
 - (void)viewDidAppear:(BOOL)animated
 {
+<<<<<<< HEAD
+=======
+    if (self.displaysAddressBar) {
+        [self updateTopCollectionViewInset];
+    }
+>>>>>>> layerhq/master
     [super viewDidAppear:animated];
     self.messageInputToolbar.translucent = YES;
 }
@@ -141,10 +150,19 @@ static CGFloat const ATLMaxScrollDistanceFromBottom = 150;
     [super viewWillDisappear:animated];
     
     self.messageInputToolbar.translucent = NO;
+<<<<<<< HEAD
     // Workaround for view's content flashing onscreen after pop animation concludes on iOS 8.
     BOOL isPopping = ![self.navigationController.viewControllers containsObject:self];
     if (isPopping) {
         [self.messageInputToolbar.textInputView resignFirstResponder];
+=======
+    if (SYSTEM_VERSION_LESS_THAN(@"9.0")) {
+        // Workaround for view's content flashing onscreen after pop animation concludes on iOS 8.
+        BOOL isPopping = ![self.navigationController.viewControllers containsObject:self];
+        if (isPopping) {
+            [self.messageInputToolbar.textInputView resignFirstResponder];
+        }
+>>>>>>> layerhq/master
     }
 }
 
@@ -220,6 +238,9 @@ static CGFloat const ATLMaxScrollDistanceFromBottom = 150;
 
 - (void)keyboardWillShow:(NSNotification *)notification
 {
+    if ([[self navigationController] modalPresentationStyle] == UIModalPresentationPopover) {
+        return;
+    }
     [self configureWithKeyboardNotification:notification];
 }
 
@@ -329,7 +350,7 @@ static CGFloat const ATLMaxScrollDistanceFromBottom = 150;
 
 - (void)configureTypingIndicatorLayoutConstraints
 {
-    // Typing Indicatr
+    // Typing Indicator
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.typingIndicatorController.view attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0]];
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.typingIndicatorController.view attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeWidth multiplier:1.0 constant:0]];
     [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.typingIndicatorController.view attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:ATLTypingIndicatorHeight]];

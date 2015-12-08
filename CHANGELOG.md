@@ -1,5 +1,52 @@
 # Atlas Changelog
 
+## 1.0.15
+
+### Bug Fixes
+
+* Changed dependency to LayerKit v0.17.1 to pick up module import changes.
+
+## 1.0.14
+
+### Enhancements
+
+* Added support for configuring the right button title in `ATLMessageInputToolbar`.
+
+### Bug Fixes
+
+* Fixed an issue with slow scrolling performance under iOS 9.
+* Fixed build problems in Swift projects regarding non-module header imports.
+
+## 1.0.13
+
+### Public API Changes
+
+* Exposed `ATLConversationViewController` method `sendMessage:` to allow custom `LYRMessage` objects to use Atlas delegate handling.
+* Introduced `verticalMargin` property on `ATLMessageInputToolbar` to specify top and bottom margins for the text input view.
+
+### Enhancements
+
+* Improved `UIMenuController` behavior.
+
+### Bug Fixes
+
+* Updated the Atlas podspec that caused build errors for some users.
+* Fixed an iOS9 bug with duplicate keyboards being dismissed.
+
+## 1.0.12
+
+### Enhancements
+
+* Improved `UIMenuController` behavior while scrolling.
+* Cached message cell height to improve scrolling performance.
+* Added native video support.
+* Atlas uses `LayerKit v0.17.0` which provides support for dynamic frameworks.
+
+### Bug Fixes
+
+* Fixed iOS9 issue with the `ATLMessageInputToolbar` having a black background when presented on screen.
+* Fixed iOS9 breaking layout constraints.
+
 ## 1.0.11
 
 ### Public API Changes
