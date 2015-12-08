@@ -249,12 +249,6 @@
 /**
  @abstract The controller used to display search results.
  */
-<<<<<<< HEAD
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated"
-@property (nonatomic, readonly) UISearchDisplayController *searchController;
-#pragma clang diagnostic pop
-=======
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 @property (nonatomic, readonly) UISearchDisplayController *searchController;
@@ -267,7 +261,6 @@
  @default `YES`.
  */
 @property (nonatomic, assign) BOOL shouldDisplaySearchController;
->>>>>>> layerhq/master
 
 ///------------------------------
 /// @name Reloading Conversations

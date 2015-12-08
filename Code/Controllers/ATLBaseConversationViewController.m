@@ -117,12 +117,9 @@ static CGFloat const ATLMaxScrollDistanceFromBottom = 150;
 
 - (void)viewDidAppear:(BOOL)animated
 {
-<<<<<<< HEAD
-=======
     if (self.displaysAddressBar) {
         [self updateTopCollectionViewInset];
     }
->>>>>>> layerhq/master
     [super viewDidAppear:animated];
     self.messageInputToolbar.translucent = YES;
 }
@@ -150,19 +147,12 @@ static CGFloat const ATLMaxScrollDistanceFromBottom = 150;
     [super viewWillDisappear:animated];
     
     self.messageInputToolbar.translucent = NO;
-<<<<<<< HEAD
-    // Workaround for view's content flashing onscreen after pop animation concludes on iOS 8.
-    BOOL isPopping = ![self.navigationController.viewControllers containsObject:self];
-    if (isPopping) {
-        [self.messageInputToolbar.textInputView resignFirstResponder];
-=======
     if (SYSTEM_VERSION_LESS_THAN(@"9.0")) {
         // Workaround for view's content flashing onscreen after pop animation concludes on iOS 8.
         BOOL isPopping = ![self.navigationController.viewControllers containsObject:self];
         if (isPopping) {
             [self.messageInputToolbar.textInputView resignFirstResponder];
         }
->>>>>>> layerhq/master
     }
 }
 

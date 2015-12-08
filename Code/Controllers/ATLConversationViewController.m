@@ -561,14 +561,11 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
 
 - (void)messageInputToolbar:(ATLMessageInputToolbar *)messageInputToolbar didTapLeftAccessoryButton:(UIButton *)leftAccessoryButton
 {
-<<<<<<< HEAD
     /*
-=======
     if (messageInputToolbar.textInputView.isFirstResponder) {
         [messageInputToolbar.textInputView resignFirstResponder];
     }
     
->>>>>>> layerhq/master
     UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
                                                              delegate:self
                                                     cancelButtonTitle:ATLLocalizedString(@"atl.conversation.toolbar.actionsheet.cancel.key", @"Cancel", nil)
@@ -625,7 +622,6 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
 - (LYRMessage *)messageForMessageParts:(NSArray *)parts MIMEType:(NSString *)MIMEType pushText:(NSString *)pushText;
 {
     NSString *senderName = [[self participantForIdentifier:self.layerClient.authenticatedUserID] fullName];
-<<<<<<< HEAD
     
     NSString *notificationText = NSLocalizedString(@"SENT_YOU_A_MESSAGE", nil);
     notificationText = [NSString stringWithFormat: notificationText, senderName];
@@ -642,26 +638,6 @@ static NSString *const ATLDefaultPushAlertText = @"sent you a message.";
     if (error) {
         return nil;
     }
-=======
-    NSString *completePushText;
-    if (!pushText) {
-        if ([MIMEType isEqualToString:ATLMIMETypeImageGIF]) {
-            completePushText = [NSString stringWithFormat:@"%@ %@", senderName, ATLDefaultPushAlertGIF];
-        } else if ([MIMEType isEqualToString:ATLMIMETypeImagePNG] || [MIMEType isEqualToString:ATLMIMETypeImageJPEG]) {
-            completePushText = [NSString stringWithFormat:@"%@ %@", senderName, ATLDefaultPushAlertImage];
-        } else if ([MIMEType isEqualToString:ATLMIMETypeLocation]) {
-            completePushText = [NSString stringWithFormat:@"%@ %@", senderName, ATLDefaultPushAlertLocation];
-        } else if ([MIMEType isEqualToString:ATLMIMETypeVideoMP4]){
-            completePushText = [NSString stringWithFormat:@"%@ %@", senderName, ATLDefaultPushAlertVideo];
-        } else {
-            completePushText = [NSString stringWithFormat:@"%@ %@", senderName, ATLDefaultPushAlertText];
-        }
-    } else {
-        completePushText = [NSString stringWithFormat:@"%@: %@", senderName, pushText];
-    }
-    
-    LYRMessage *message = ATLMessageForParts(self.layerClient, parts, completePushText, ATLPushNotificationSoundName);
->>>>>>> layerhq/master
     return message;
 }
 
